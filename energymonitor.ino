@@ -1,6 +1,7 @@
 #include <EtherCard.h>
 #include <NanodeMAC.h>
 
+#define CC_RX 4
 #define GREEN_LED 5
 #define RED_LED 6
 
@@ -12,6 +13,8 @@ void setup() {
     Serial.begin(57600);
     Serial.println(F("\n[energymonitor]"));
 
+    currentCostSetup();
+
     //pin setups
     pinMode(RED_LED, OUTPUT);
     digitalWrite(RED_LED, HIGH);
@@ -21,7 +24,7 @@ void setup() {
     digitalWrite(GREEN_LED, LOW);
     Serial.print(F("Completed setup in "));
     Serial.print(millis());
-    Serial.print(F("ms"));
+    Serial.println(F("ms"));
 }
 
 void setupNetwork() {
@@ -47,7 +50,9 @@ void setupNetwork() {
     ether.printIp(F("DNS IP: "), ether.dnsip);
 }
 
-void loop() {}
+void loop() {
+    readCurrentCost();
+}
 
 void critical(__FlashStringHelper* message) {
     // Print the error message.
