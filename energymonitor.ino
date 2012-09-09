@@ -1,13 +1,8 @@
-#include <EtherCard.h>
-#include <NanodeMAC.h>
-
 #define CC_RX 4
 #define GREEN_LED 5
 #define RED_LED 6
 
-static byte mymac[] = { 0,0,0,0,0,0 };
-
-byte Ethernet::buffer[700];
+boolean dataReady=false;
 
 void setup() {
     Serial.begin(57600);
@@ -27,31 +22,13 @@ void setup() {
     Serial.println(F("ms"));
 }
 
-void setupNetwork() {
-    NanodeMAC mac(mymac);
-    Serial.print(F("MAC: "));
-    for (byte i = 0; i < 6; ++i) {
-        Serial.print(mymac[i], HEX);
-        if (i < 5)
-            Serial.print(':');
-    }
-    Serial.println();
-
-    if (ether.begin(sizeof Ethernet::buffer, mymac) == 0)
-        critical(F("Failed to access Ethernet controller"));
-
-    Serial.println(F("Setting up DHCP"));
-    if (!ether.dhcpSetup())
-        critical(F("DHCP failed"));
-
-    ether.printIp(F("My IP: "), ether.myip);
-    ether.printIp(F("Netmask: "), ether.mymask);
-    ether.printIp(F("GW IP: "), ether.gwip);
-    ether.printIp(F("DNS IP: "), ether.dnsip);
-}
-
 void loop() {
+    checkNetwork();
     readCurrentCost();
+    if (dataReady) {
+        dataReady = false;
+        uploadData();
+    }
 }
 
 void critical(__FlashStringHelper* message) {
@@ -62,5 +39,5 @@ void critical(__FlashStringHelper* message) {
     digitalWrite(GREEN_LED, HIGH);
     digitalWrite(RED_LED, LOW);
     // Wait here.
-    while (true);
+    while(1);
 }

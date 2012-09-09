@@ -26,7 +26,6 @@ char Tmpr[8] = "";
 //instantaneous energy values for gas and electricity
 float elecW = 0;
 
-boolean dataReady=false;
 double temp;
 
 void currentCostSetup()
@@ -41,7 +40,6 @@ void readCurrentCost()
     if (!ccSerial.available())
         return;
     digitalWrite(GREEN_LED, HIGH);
-    bool dump = false;
     while ((readChar = ccSerial.read()) != -1)
     {
         if (ccSerial.overflow())
@@ -60,15 +58,15 @@ void readCurrentCost()
             //Serial.println( Pwr );
             elecW = atol(Pwr);
             temp = strtod(Tmpr,NULL);
-            Serial.flush();
-            Serial.print("Pwr: ");
-            Serial.print(elecW);
-            Serial.print(" ");
-            Serial.print(" Tmpr: ");
-            Serial.print(temp);
-            Serial.println(".");
-            Serial.flush();
             if (elecW && temp) {
+                Serial.flush();
+                Serial.print("Pwr: ");
+                Serial.print(elecW);
+                Serial.print(" ");
+                Serial.print(" Tmpr: ");
+                Serial.print(temp);
+                Serial.println(".");
+                Serial.flush();
                 dataReady = true;
                 digitalWrite(GREEN_LED, LOW);
                 digitalWrite(RED_LED, HIGH);
@@ -76,7 +74,6 @@ void readCurrentCost()
 
             memset(Pwr,255,sizeof(Pwr));
             memset(Tmpr,255,sizeof(Tmpr));
-
         }
     }
     //Serial.println();
