@@ -4,10 +4,13 @@
 #include "keys.h"
 
 static byte mymac[] = { 0,0,0,0,0,0 };
+static byte session;
+char statusline[13];
 
 byte Ethernet::buffer[700];
 Stash stash;
 char website[] PROGMEM = "api.pachube.com";
+bool awaiting_reply = false;
 
 void setupNetwork() {
     NanodeMAC mac(mymac);
@@ -65,7 +68,8 @@ void uploadData()
             website, PSTR(FEED), website, PSTR(APIKEY), stash.size(), sd);
 
     // send the packet - this also releases all stash buffers once done
-    ether.tcpSend();
+    session = ether.tcpSend();
+    awaiting_reply = true;
 }
 
 //call regularly to keep network going
@@ -73,4 +77,21 @@ void checkNetwork()
 {
   // handle ping and wait for a tcp packet
   ether.packetLoop(ether.packetReceive());
+  if (awaiting_reply) {
+    const char* reply = ether.tcpReply(session);
+    if (reply != 0) {
+      awaiting_reply = false;
+      strncpy(statusline, reply, 13);
+      String replyString = statusline;
+      if (replyString.substring(9, 12) == "200") {
+        digitalWrite(RED_LED, HIGH);
+        Serial.println(F("200 response received"));
+      }
+      else {
+        digitalWrite(RED_LED, LOW);
+        Serial.print(F("Response received: "));
+        Serial.println(reply);
+      }
+    }
+  }
 }
