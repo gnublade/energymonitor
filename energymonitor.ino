@@ -1,8 +1,14 @@
-#define CC_RX 4
 #define GREEN_LED 5
 #define RED_LED 6
 
 #define DEBUG  0
+#define SERIAL 1
+
+#if SERIAL
+#define CC_RX 0
+#else
+#define CC_RX 4
+#endif
 
 boolean dataReady=false;
 

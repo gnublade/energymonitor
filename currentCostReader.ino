@@ -1,6 +1,10 @@
 #include <SoftwareSerial.h>
 
+#if SERIAL
+#define ccSerial Serial
+#else
 SoftwareSerial ccSerial(CC_RX, NULL);
+#endif
 
 char startPwr[] = "<ch1><watts>";
 char startTmpr[] = "<tmpr>";
