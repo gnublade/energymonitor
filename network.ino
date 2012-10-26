@@ -14,6 +14,7 @@ bool awaiting_reply = false;
 
 void setupNetwork() {
     NanodeMAC mac(mymac);
+#if DEBUG
     Serial.print(F("MAC: "));
     for (byte i = 0; i < 6; ++i) {
         Serial.print(mymac[i], HEX);
@@ -21,27 +22,36 @@ void setupNetwork() {
             Serial.print(':');
     }
     Serial.println();
+#endif
 
     if (ether.begin(sizeof Ethernet::buffer, mymac) == 0)
         critical(F("Failed to access Ethernet controller"));
 
+#if DEBUG
     Serial.println(F("Setting up DHCP"));
+#endif
     if (!ether.dhcpSetup())
         critical(F("DHCP failed"));
 
+#if DEBUG
     ether.printIp(F("My IP: "), ether.myip);
     ether.printIp(F("Netmask: "), ether.mymask);
     ether.printIp(F("GW IP: "), ether.gwip);
     ether.printIp(F("DNS IP: "), ether.dnsip);
+#endif
 
     if (!ether.dnsLookup(website))
         critical(F("DNS failed"));
+#if DEBUG
     ether.printIp(F("SRV: "), ether.hisip);
+#endif
 }
 
 void uploadData()
 {
+#if DEBUG
     Serial.print(F("pushing to cosm: "));
+#endif
 
     byte sd = stash.create();
     stash.print("0,");
@@ -50,12 +60,14 @@ void uploadData()
     stash.println(elecW);
     stash.save();
 
+#if DEBUG
     char c;
     while (c = stash.get()) {
         if (c != 10)
             Serial.print(c == 13 ? '\t' : c);
     }
     Serial.println();
+#endif
 
     // generate the header with payload - note that the stash size is used,
     // and that a "stash descriptor" is passed in as argument using "$H"
@@ -85,12 +97,16 @@ void checkNetwork()
       String replyString = statusline;
       if (replyString.substring(9, 12) == "200") {
         digitalWrite(RED_LED, HIGH);
+#if DEBUG
         Serial.println(F("200 response received"));
+#endif
       }
       else {
         digitalWrite(RED_LED, LOW);
+#if DEBUG
         Serial.print(F("Response received: "));
         Serial.println(reply);
+#endif
       }
     }
   }

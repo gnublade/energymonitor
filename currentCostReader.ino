@@ -59,6 +59,7 @@ void readCurrentCost()
             elecW = atol(Pwr);
             temp = strtod(Tmpr,NULL);
             if (elecW && temp) {
+#if DEBUG
                 Serial.flush();
                 Serial.print("Pwr: ");
                 Serial.print(elecW);
@@ -67,6 +68,7 @@ void readCurrentCost()
                 Serial.print(temp);
                 Serial.println(".");
                 Serial.flush();
+#endif
                 dataReady = true;
                 digitalWrite(GREEN_LED, LOW);
                 digitalWrite(RED_LED, HIGH);
